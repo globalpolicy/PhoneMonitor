@@ -1,5 +1,6 @@
 # PhoneMonitor
-A Remote Administration Tool for Android devices
+A Remote Administration Tool for Android devices<br/>
+The Minimum SDK version is API 15 and by its nature, the Target API level is 21.
 <hr/>
 <h3>Instructions:</h3>
 <ul>
