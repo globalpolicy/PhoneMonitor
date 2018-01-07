@@ -19,3 +19,5 @@ A Remote Administration Tool for Android devices
 <ul>
 <li>Install the APK in the desired Android device.</li>
 </ul>
+<hr/>
+<i>Check the Wiki for more information.</i>
