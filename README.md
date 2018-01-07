@@ -5,7 +5,7 @@ A Remote Administration Tool for Android devices
 <ul>
 <li>Open the folder PhoneMonitor with Android Studio.</li>
 <li>Replace the XXXX strings with the relevant substitutes from AppSettings.java file.</li>
-<li>Create a signed APK.</li>
+<li>Build a signed APK.</li>
 </ul>
 <hr/>
 <ul>
