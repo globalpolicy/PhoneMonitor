@@ -71,7 +71,7 @@ function CreateClientlistTableIfNotExists(&$conn)
         //table doesn't exist
         $createmaintablequery="CREATE TABLE clientlist (
         Number VARCHAR(30), IMEI VARCHAR(30), Manufacturer VARCHAR(30), Model VARCHAR(30), 
-        UniqueId VARCHAR(30), LastSeen DATETIME NOT NULL, UNIQUE (IMEI, UniqueId))";
+        UniqueId VARCHAR(255), LastSeen DATETIME NOT NULL, UNIQUE (IMEI, UniqueId))";
         if(!$conn->query($createmaintablequery))//create new table
         {
             //if error during the creation process
@@ -90,7 +90,7 @@ function CreateCommandlistTableIfNotExists(&$conn)
     {
         //table doesn't exist
         $createmaintablequery="CREATE TABLE commandlist (
-        DeviceUniqueId VARCHAR(30), CommandId INT, Pending BOOLEAN, AddedDateTime DATETIME,
+        DeviceUniqueId VARCHAR(255), CommandId INT, Pending BOOLEAN, AddedDateTime DATETIME,
         ExecutedDateTime DATETIME, Param1 TEXT, Param2 TEXT, Param3 TEXT, Param4 TEXT, Result TEXT)";
         if(!$conn->query($createmaintablequery))//create new table
         {
@@ -110,7 +110,7 @@ function CreateSettingsTableIfNotExists(&$conn)
     {
         //table doesn't exist
         $createtablequery="CREATE TABLE settings (
-        DeviceUniqueId VARCHAR(30), ForceWifiOnForRecordUpload BOOLEAN, ServerTalkInterval INT, UNIQUE(DeviceUniqueId))";
+        DeviceUniqueId VARCHAR(255), ForceWifiOnForRecordUpload BOOLEAN, ServerTalkInterval INT, UNIQUE(DeviceUniqueId))";
         if(!$conn->query($createtablequery))//create new table
         {
             //if error during the creation process
