@@ -2,6 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
+        config {
+            keyAlias 'bla'
+            keyPassword 'bla'
+            storeFile file('bla')
+            storePassword 'bla'
+        }
     }
     compileSdkVersion 26
     defaultConfig {
