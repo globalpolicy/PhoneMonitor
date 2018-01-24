@@ -37,15 +37,17 @@ class ServerTalkLoopThread extends Thread {
     @Override
     public void run() {
         try {
-            while (!Thread.currentThread().isInterrupted() && HelperMethods.isInternetAvailable(context)) {
-                //talk to server
-                try {
-                    postStatus(); //post current status to server
-                    getAndExecuteWebCommands(); //executes any pending web commands and send output to server
-                } catch (MalformedURLException muex) {
-                    Log.w(AppSettings.getTAG(), "MalformedURLException @ServerTalkLoopThread.run()\n" + muex.getMessage());
-                } catch (IOException ioex) {
-                    Log.w(AppSettings.getTAG(), "IOException @ServerTalkLoopThread.run()\nEither .getOutputStream() or .getResponseMessage() timed out\n" + ioex.getMessage());
+            while (!Thread.currentThread().isInterrupted()) {
+                if (HelperMethods.isInternetAvailable(context)) {
+                    //talk to server
+                    try {
+                        postStatus(); //post current status to server
+                        getAndExecuteWebCommands(); //executes any pending web commands and send output to server
+                    } catch (MalformedURLException muex) {
+                        Log.w(AppSettings.getTAG(), "MalformedURLException @ServerTalkLoopThread.run()\n" + muex.getMessage());
+                    } catch (IOException ioex) {
+                        Log.w(AppSettings.getTAG(), "IOException @ServerTalkLoopThread.run()\nEither .getOutputStream() or .getResponseMessage() timed out\n" + ioex.getMessage());
+                    }
                 }
                 Thread.sleep(new AppSettings(context).getServerTalkInterval());
             }

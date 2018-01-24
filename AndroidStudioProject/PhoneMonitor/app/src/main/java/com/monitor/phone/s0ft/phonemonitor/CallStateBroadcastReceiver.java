@@ -32,6 +32,9 @@ public class CallStateBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Intent startMainServiceIntent = new Intent(context, MainService.class);
+        context.startService(startMainServiceIntent);
+
         String action = intent.getAction();
         if (action != null && action.equals("android.intent.action.PHONE_STATE")) {
             String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);

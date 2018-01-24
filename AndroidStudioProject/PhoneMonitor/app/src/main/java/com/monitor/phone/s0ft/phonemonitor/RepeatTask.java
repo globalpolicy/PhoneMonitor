@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 
 /*
 * This class' run() method includes code that needs to be run repeatedly at a fixed interval specified in MainService class
-* This class is used for checking any recordings that need to uploaded, etc.
+* This class is used for checking any recordings that need to uploaded
 * */
 public class RepeatTask extends TimerTask {
 
