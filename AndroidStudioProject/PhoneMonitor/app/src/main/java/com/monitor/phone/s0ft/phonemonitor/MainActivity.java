@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
         Intent intent=new Intent(this,MainService.class);
         startService(intent);
         finish();
+        
     }
 
 
