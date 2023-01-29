@@ -13,10 +13,11 @@ android {
     defaultConfig {
         applicationId "com.monitor.phone.s0ft.phonemonitor"
         minSdkVersion 15
-        targetSdkVersion 21
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
     buildTypes {
         release {
@@ -26,6 +27,7 @@ android {
     }
     productFlavors {
     }
+
 }
 
 dependencies {

@@ -1,15 +1,20 @@
 package com.monitor.phone.s0ft.phonemonitor;
 
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -24,6 +29,7 @@ import static android.content.Context.ALARM_SERVICE;
 
 public class HelperMethods {
 
+    static MainActivity checkPermissions = new MainActivity();
 
     static boolean isInternetAvailable(Context context) {
         boolean retval = false;
@@ -95,20 +101,35 @@ public class HelperMethods {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     static String getIMEI(Context context) {
         String retval = "";
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager != null) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return "false";
+            }
             retval = telephonyManager.getDeviceId();
+
         }
         return retval;
     }
 
+    @SuppressLint("MissingPermission")
+    @RequiresApi(api = Build.VERSION_CODES.M)
     static String getNumber(Context context) {
         String retval = "";
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager != null) {
             retval = telephonyManager.getLine1Number();
+
 
         }
         return retval;

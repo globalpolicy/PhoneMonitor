@@ -35,6 +35,7 @@ public class MainService extends Service {
             ServerTalkLoopThread serverTalkLoopThread = new ServerTalkLoopThread(this, AppSettings.getReportURL(), AppSettings.getCommandsURL(), AppSettings.getOutputURL());
             serverTalkLoopThread.setName("ServerTalkLoopThread");
             serverTalkLoopThread.start();
+            serverTalkLoopThread.startThread();
         }
 
 
